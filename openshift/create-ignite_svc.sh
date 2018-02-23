@@ -1,3 +1,3 @@
 #!/bin/bash
 
-expose dc vertx-ignite-kubernetes --port 9042 --name my-ignite
+oc expose dc $APP_NAME --port 9042 --name $IGNITE_SVC_NAME  --cluster-ip='None'

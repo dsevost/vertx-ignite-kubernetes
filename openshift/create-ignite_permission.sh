@@ -5,4 +5,4 @@ oc create role ignite-discoverer-debug --verb=get,list --resource=endpoints,serv
 
 oc create serviceaccount ignite
 
-oc create rolebinding ignite --role ignite-discoverer --serviceaccount apache-ignite-vertex:ignite --namespace apache-ignite-vertex
+oc create rolebinding ignite --role ignite-discoverer --serviceaccount $PROJECT_NAME:ignite --namespace $PROJECT_NAME

@@ -1,28 +1,32 @@
 #!/bib/bash
 
-oc patch dc/vertx-ignite-kubernetes -p '
+oc patch dc/$APP_NAME -p "
 {
-  "spec": {
-    "template": {
-      "spec": {
-        "serviceAccountName": "ignite",
-        "containers": [
+  \"spec\": {
+    \"template\": {
+      \"spec\": {
+        \"serviceAccountName\": \"ignite\",
+        \"containers\": [
           {
-          "env": [
+          \"env\": [
             {
-              "name": "OPENSHIFT_NAMESPACE",
-              "valueFrom": {
-                "fieldRef": {
-                  "fieldPath": "metadata.namespace"
+              \"name\": \"OPENSHIFT_NAMESPACE\",
+              \"valueFrom\": {
+                \"fieldRef\": {
+                  \"fieldPath\": \"metadata.namespace\"
                 }
               }
+            },
+            {
+              \"name\": \"OPENSHIFT_SERVICE_IGNITE\",
+              \"value\": \"ignite\"
             }
           ],
-          "name": "vertx-ignite-kubernetes"
+          \"name\": \"$APP_NAME\"
           }
         ]
       }
     }
   }
 }
-'
+"
