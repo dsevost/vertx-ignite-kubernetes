@@ -12,7 +12,7 @@
                 <property name="ipFinder">
                     <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder">
                       <property name="namespace" value="#{systemProperties['openshift.namespace']}" />
-                      <property name="serviceName" value="my-ignite" />
+                      <property name="serviceName" value="#{systemProperties['openshift.service.ignite']}" />
                     </bean>
                     <!-- bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
                       <property name="addresses">
