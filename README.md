@@ -15,4 +15,4 @@ $ # export MAVEN_MIRROR_URL=http://your.nexus.domain
 
 $ JAVA_OPTIONS=$JAVA_OPTIONS -Dopenshift.namespace=OPENSHIFT_NAMESPACE 
 
-$ oc new-app redhat-openjdk18-openshift~$GIT_REPO$GIT_REF -e JAVA_APP_JAR=app-fat.jar -e MAVEN_MIRROR_URL=$MAVEN_MIRROR_URL -e JAVA_OPTIONS="$JAVA_OPTIONS" 
+$ oc new-app redhat-openjdk18-openshift~$GIT_REPO$GIT_REF --build-env MAVEN_MIRROR_URL=$MAVEN_MIRROR_URL -e JAVA_APP_JAR=app-fat.jar -e JAVA_OPTIONS="$JAVA_OPTIONS" 
