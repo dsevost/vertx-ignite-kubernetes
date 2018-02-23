@@ -28,14 +28,19 @@ public class MainApp {
     private static Vertx vertx;
 
     public static void main(String args[]) throws IOException {
-        //Найдем все Ip адреса
+/*        //Найдем все Ip адреса
         List<Inet4Address> inetAddresses = getNonLoopbackLocalIPv4Addresses();
         System.out.println("Available ipv4 addresses: " + Arrays.toString(inetAddresses.toArray()));
         //Отфильтруем ненужное
         String publicClusterHost = filterAddresses(inetAddresses);
 
         System.out.println("Public cluster host: " + publicClusterHost);
-
+*/
+        String publicClusterHost = System.getenv().get("POD_IP");
+        if ( publicClusterHost == null || publicClusterHost.equals("") ) {
+    	    publicClusterHost = InetAddress.getLocalHost().getHostAddress();
+        }
+        System.out.println("Public cluster host: " + publicClusterHost);
         VertxOptions options = new VertxOptions()
                 .setClustered(true)
                 .setClusterManager(getIgniteClusterManager())

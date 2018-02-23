@@ -18,6 +18,14 @@ oc patch dc/$APP_NAME -p "
               }
             },
             {
+              \"name\": \"POD_IP\",
+              \"valueFrom\": {
+                \"fieldRef\": {
+                  \"fieldPath\": \"status.podIP\"
+                }
+              }
+            },
+            {
               \"name\": \"OPENSHIFT_SERVICE_IGNITE\",
               \"value\": \"ignite\"
             }
