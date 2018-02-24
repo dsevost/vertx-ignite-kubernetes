@@ -32,5 +32,5 @@ $ sh openshift/patch-dc.sh
 
 $ oc expose svc $APP_NAME --port 8080
 
-$ echo Clean all ; oc delete all -l $APP_NAME
+$ echo Clean all ; oc delete bc,dc,is,rolebinding,role,route,sa,svc -l app=$APP_NAME
 

@@ -1,6 +1,24 @@
 apiVersion: v1
 kind: Template
+labels:
+  template: ignite-vertex-sample
+message: |-
+  The following service(s) have been created in your project: ${APP_NAME}, ${OPENSHIFT_SERVICE_IGNITE}
+
+  For more information about using this template, including OpenShift considerations, see
+  https://github.com/dsevost/vertx-ignite-kubernetes/blob/master/README.md.
 metadata:
+  annotations:
+    description: An example Apache Ignite and Eclipse Vert.x. For more information about using this template,
+      including OpenShift considerations, see https://github.com/dsevost/vertx-ignite-kubernetes/blob/master/README.md.
+    openshift.io/display-name: Apache Ignite and Eclipse Vert.x
+    openshift.io/documentation-url: https://github.com/dsevost/vertx-ignite-kubernetes
+    openshift.io/long-description: This template defines resources needed to develop
+      a Timestamp application, including a build configuration, application deployment
+      configuration, and security objects for Grid Nodes discovering.
+    iconClass: icon-openjdk
+    tags: quickstart,java,vertx,ignite
+  description: Apacge Ignite and Exclipse Vert.x demo
   name: ignite-vertex-sample
 objects:
 - apiVersion: v1
@@ -28,6 +46,7 @@ objects:
           kind: ImageStreamTag
           name: redhat-openjdk18-openshift:latest
           namespace: openshift
+#        incremental: ${INCREMENTAL_BUILD}
       type: Source
     triggers:
     - github:
@@ -39,6 +58,16 @@ objects:
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${APP_NAME}
+      build: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    lookupPolicy:
+      local: true
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -205,10 +234,13 @@ objects:
 #    name: ${IGNITE_SERVICE_ACCOUNT}
 parameters:
 - name: APP_NAME
+  description: A built application name. All created objects will have label app=${APP_NAME}
   value: timestamp
 - name: SOURCE_REPOSITORY_URI
+  description: Source repository URL
   value: https://github.com/dsevost/vertx-ignite-kubernetes
 - name: SOURCE_REPOSITORY_REF
+  description: Branch or Tag in Source repository
   value: dev
 - name: GITHUB_HOOK_SECRET
   generate: expression 
@@ -217,12 +249,21 @@ parameters:
   generate: expression 
   from: "[a-zA-Z0-9]{40}"
 - name: MAVEN_MIRROR_URL
+  description: Maven reposritory custom URL. If there is one or you do not have an internet connection user this variable to point a local Maven repository
   value: ''
+#- name: INCREMENTAL_BUILD
+#  description: Set to "True" if you would like an incremental builds
+#  value: "False"
 - name: OPENSHIFT_SERVICE_IGNITE
+  description: A special headless service provides lookup for Ignite nodes in cluster
   value: ignite-discoverer
 - name: IGNITE_SERVICE_ACCOUNT
+  description: Application with Apache Ignite should have nessessary privileges to retrieve ednpoints from ${OPENSHIFT_SERVICE_IGNITE}. And this is account
+    name who will have special role to query endpoints.
   value: ignite-sa
 - name: IGNITE_DISCOVERER_ROLE
+  description: Application with Apache Ignite should have nessessary privileges to retrieve ednpoints. This role permits running PODs to get list of
+    Ignite service discover.
   value: ignite-discoverer
 #- name: CURRENT_PROJECT_NAME
 #  required: true
