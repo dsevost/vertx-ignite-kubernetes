@@ -1,0 +1,228 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ignite-vertex-sample
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APP_NAME}:latest
+    source:
+      git:
+        uri: ${SOURCE_REPOSITORY_URI}
+        ref: ${SOURCE_REPOSITORY_REF}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: MAVEN_MIRROR_URL
+          value: ${MAVEN_MIRROR_URL}
+        from:
+          kind: ImageStreamTag
+          name: redhat-openjdk18-openshift:latest
+          namespace: openshift
+      type: Source
+    triggers:
+    - github:
+        secret: ${GITHUB_HOOK_SECRET}
+      type: GitHub
+    - generic:
+        secret: ${WEB_HOOK_SECRET}
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${APP_NAME}
+      deploymentConfig: ${APP_NAME}
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: ${APP_NAME}
+          deploymentConfig: ${APP_NAME}
+      spec:
+        containers:
+        - env:
+          - name: OPENSHIFT_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: OPENSHIFT_SERVICE_IGNITE
+            value: ${OPENSHIFT_SERVICE_IGNITE}
+          - name: JAVA_APP_JAR
+            value: app-fat.jar
+          image: ' '
+          imagePullPolicy: Always
+          name: ${APP_NAME}
+          ports:
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 8080
+            protocol: TCP
+        serviceAccount: ${IGNITE_SERVICE_ACCOUNT}
+        serviceAccountName: ${IGNITE_SERVICE_ACCOUNT}
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${OPENSHIFT_SERVICE_IGNITE}
+  spec:
+    ports:
+    - port: 9042
+      protocol: TCP
+      targetPort: 9042
+    selector:
+      app: ${APP_NAME}
+      deploymentConfig: ${APP_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: 8778-tcp
+      port: 8778
+      protocol: TCP
+      targetPort: 8778
+    selector:
+      app: ${APP_NAME}
+      deploymentConfig: ${APP_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: ${APP_NAME}
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${IGNITE_SERVICE_ACCOUNT}
+- apiVersion: v1
+  kind: Role
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${IGNITE_DISCOVERER_ROLE}
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - endpoints
+    verbs:
+    - get
+#
+# This rolebinding definition requires OpenShift 3.7+
+#
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ignite
+  roleRef:
+    kind: Role
+    name: ${IGNITE_DISCOVERER_ROLE}
+  subjects:
+  - kind: ServiceAccount
+    name: ${IGNITE_SERVICE_ACCOUNT}
+##
+## This rolebinding definition requires ${CURRENT_PROJECT_NAME} parameter to be defined
+##
+#- apiVersion: v1
+#  kind: RoleBinding
+#  metadata:
+#    labels:
+#      app: ${APP_NAME}
+#    name: ignite
+#    namespace: ${CURRENT_PROJECT_NAME}
+#  roleRef:
+#    kind: Role
+#    name: ${IGNITE_DISCOVERER_ROLE}
+#  subjects:
+#  - kind: ServiceAccount
+#    name: ${IGNITE_SERVICE_ACCOUNT}
+parameters:
+- name: APP_NAME
+  value: timestamp
+- name: SOURCE_REPOSITORY_URI
+  value: https://github.com/dsevost/vertx-ignite-kubernetes
+- name: SOURCE_REPOSITORY_REF
+  value: dev
+- name: GITHUB_HOOK_SECRET
+  generate: expression 
+  from: "[a-zA-Z0-9]{40}"
+- name: GENERIC_HOOK_SECRET
+  generate: expression 
+  from: "[a-zA-Z0-9]{40}"
+- name: MAVEN_MIRROR_URL
+  value: ''
+- name: OPENSHIFT_SERVICE_IGNITE
+  value: ignite-discoverer
+- name: IGNITE_SERVICE_ACCOUNT
+  value: ignite-sa
+- name: IGNITE_DISCOVERER_ROLE
+  value: ignite-discoverer
+#- name: CURRENT_PROJECT_NAME
+#  required: true
