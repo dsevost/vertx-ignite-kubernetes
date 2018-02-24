@@ -57,7 +57,7 @@ public class HttpServerVerticle extends AbstractVerticle {
                 .method(GET)
                 .handler(this::getTimestamp);
 
-	Router service = httpRouter.route(vertex);
+	Router service = httpRouter.route(vertx);
 	httpRouter.mountSubRouter("/openshift", service);
 
         // Сервис для liveness теста в OpenShift
