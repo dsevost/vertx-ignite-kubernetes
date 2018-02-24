@@ -66,7 +66,7 @@ public class HttpServerVerticle extends AbstractVerticle {
                 .handler(this::liveness);
 
         // Сервис для readyness теста в OpenShift
-        service.route("/liveness")
+        service.route("/readyness")
                 .method(GET)
                 .handler(this::readyness);
 
