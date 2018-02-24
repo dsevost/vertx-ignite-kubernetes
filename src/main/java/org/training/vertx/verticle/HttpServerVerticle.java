@@ -57,7 +57,31 @@ public class HttpServerVerticle extends AbstractVerticle {
                 .method(GET)
                 .handler(this::getTimestamp);
 
+	Router service = httpRouter.route("/openshift");
+
+        // Сервис для liveness теста в OpenShift
+        service.route("/liveness")
+                .method(GET)
+                .handler(this::liveness);
+
+        // Сервис для readyness теста в OpenShift
+        service.route("/liveness")
+                .method(GET)
+                .handler(this::readyness);
+
         return httpRouter;
+    }
+    
+    private void liveness(RoutingContext c) {
+	System.out.println("HttpServerVerticle::liveness - check for alive");
+        HttpServerResponse response = routingContext.response();
+        response.end("ALIVE");
+    }
+
+    private void readyness(RoutingContext c) {
+	System.out.println("HttpServerVerticle::readyness - check for ready to serve");
+        HttpServerResponse response = routingContext.response();
+        response.end("READY");
     }
 
     private void startModelVerticle(RoutingContext context) {
