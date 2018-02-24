@@ -88,7 +88,8 @@ objects:
           deploymentConfig: ${APP_NAME}
       spec:
         containers:
-        - env:
+        - name: ${APP_NAME}
+          env:
           - name: OPENSHIFT_NAMESPACE
             valueFrom:
               fieldRef:
@@ -105,7 +106,6 @@ objects:
             value: app-fat.jar
           image: ' '
           imagePullPolicy: Always
-          name: ${APP_NAME}
           ports:
           - containerPort: 8443
             protocol: TCP
@@ -114,6 +114,13 @@ objects:
             protocol: TCP
           - containerPort: 8080
             protocol: TCP
+          resources:
+            requests:
+              cpu: 20m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 200Mi
         serviceAccount: ${IGNITE_SERVICE_ACCOUNT}
         serviceAccountName: ${IGNITE_SERVICE_ACCOUNT}
     test: false
@@ -143,6 +150,7 @@ objects:
       deploymentConfig: ${APP_NAME}
     sessionAffinity: None
     type: ClusterIP
+    clusterIP: 'None'
 - apiVersion: v1
   kind: Service
   metadata:
