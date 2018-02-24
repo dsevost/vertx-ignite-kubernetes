@@ -74,13 +74,13 @@ public class HttpServerVerticle extends AbstractVerticle {
     
     private void liveness(RoutingContext c) {
 	System.out.println("HttpServerVerticle::liveness - check for alive");
-        HttpServerResponse response = routingContext.response();
+        HttpServerResponse response = c.response();
         response.end("ALIVE");
     }
 
     private void readyness(RoutingContext c) {
 	System.out.println("HttpServerVerticle::readyness - check for ready to serve");
-        HttpServerResponse response = routingContext.response();
+        HttpServerResponse response = c.response();
         response.end("READY");
     }
 

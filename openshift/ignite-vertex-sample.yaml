@@ -252,10 +252,10 @@ parameters:
   value: dev
 - name: GITHUB_HOOK_SECRET
   generate: expression 
-  from: "[a-zA-Z0-9]{40}"
-- name: GENERIC_HOOK_SECRET
+  from: "[a-zA-Z0-9]{10}"
+- name: WEB_HOOK_SECRET
   generate: expression 
-  from: "[a-zA-Z0-9]{40}"
+  from: "[a-zA-Z0-9]{10}"
 - name: MAVEN_MIRROR_URL
   description: Maven reposritory custom URL. If there is one or you do not have an internet connection user this variable to point a local Maven repository
   value: ''
