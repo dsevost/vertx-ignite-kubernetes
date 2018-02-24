@@ -27,7 +27,7 @@ oc patch dc/$APP_NAME -p "
             },
             {
               \"name\": \"OPENSHIFT_SERVICE_IGNITE\",
-              \"value\": \"ignite\"
+              \"value\": \"$IGNITE_SVC_NAME\"
             }
           ],
           \"name\": \"$APP_NAME\"
