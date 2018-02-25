@@ -7,6 +7,8 @@ rc=$?
 
 cp -f /tmp/src/config/ignite.xml /deployments
 
-find /deployments -name "*-fat.jar" -print -exec ln -sf {} /deployments/${JAVA_APP_JAR:-"app-fat.jar"} \;
+JAVA_APP_JAR=${JAVA_APP_JAR:-"app-fat.jar"}
+
+find /deployments -name "*-fat.jar" -exec echo "{} -> ${JAVA_APP_JAR}" \;  -exec ln -sf {} /deployments/${JAVA_APP_JAR} \;
 
 exit $rc
