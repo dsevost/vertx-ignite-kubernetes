@@ -249,7 +249,7 @@ parameters:
   value: https://github.com/dsevost/vertx-ignite-kubernetes
 - name: SOURCE_REPOSITORY_REF
   description: Branch or Tag in Source repository
-  value: dev
+  value: ""
 - name: GITHUB_HOOK_SECRET
   generate: expression 
   from: "[a-zA-Z0-9]{10}"

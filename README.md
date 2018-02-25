@@ -10,7 +10,7 @@ $ export PROJECT_NAME=ignite-vertex APP_NAME=timestamp IGNITE_SVC_NAME=ignite
 
 $ export GIT_REPO="https://github.com/dsevost/vertx-ignite-kubernetes" 
 
-$ export GIT_REF="#dev" 
+$ # export GIT_REF="#dev" 
 
 $ # export MAVEN_MIRROR_URL=http://your.nexus.domain 
 
