@@ -4,12 +4,16 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import org.training.vertx.comman.Endpoint;
 
+import java.util.logging.Logger;
+
 /**
  * @author Anton Lenok <AILenok.SBT@sberbank.ru>
  * @since 26.04.17.
  * Verticle который символизирует фундаментальные вычисления с моделью данных
  */
 public class ModelVerticle extends AbstractVerticle {
+
+    private final static Logger LOGGER = Logger.getLogger(ModelVerticle.class.getName());
 
     private EventBus eventBus;
 
@@ -18,13 +22,13 @@ public class ModelVerticle extends AbstractVerticle {
         eventBus = vertx.eventBus();
 
         eventBus.consumer(Endpoint.EB_BROADCAST, message -> {
-            System.out.println("Model catch request for timestamp: " + message.body());
+            LOGGER.info("Model catch request for timestamp: " + message.body());
             String response = String.valueOf(System.currentTimeMillis());
-            System.out.println("Timestamp generated: " + response);
+            LOGGER.info("Timestamp generated: " + response);
             message.reply(response);
-            System.out.println("Success replied with generated timestamp: " + response);
+            LOGGER.info("Success replied with generated timestamp: " + response);
         });
 
-        System.out.println("Model verticle started!");
+        LOGGER.info("Model verticle started!");
     }
 }

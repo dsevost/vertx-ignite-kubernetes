@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export JAVA_OPTIONS="-Dopenshift.namespace=$OPENSHIFT_NAMESPACE -Dopenshift.service.ignite=${OPENSHIFT_SERVICE_IGNITE:-ignite}"
+
+exec /usr/local/s2i/run

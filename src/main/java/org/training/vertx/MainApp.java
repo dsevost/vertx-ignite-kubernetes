@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Anton Lenok <AILenok.SBT@sberbank.ru>
@@ -25,17 +26,16 @@ public class MainApp {
 
     private final static int DEFAULT_CLUSTER_PORT = 47600;
 
+    private final static Logger LOGGER = Logger.getLogger(MainApp.class.getName());
+
     private static Vertx vertx;
 
     public static void main(String args[]) throws IOException {
-        //Найдем все Ip адреса
-        List<Inet4Address> inetAddresses = getNonLoopbackLocalIPv4Addresses();
-        System.out.println("Available ipv4 addresses: " + Arrays.toString(inetAddresses.toArray()));
-        //Отфильтруем ненужное
-        String publicClusterHost = filterAddresses(inetAddresses);
-
-        System.out.println("Public cluster host: " + publicClusterHost);
-
+        String publicClusterHost = System.getenv().get("POD_IP");
+        if ( publicClusterHost == null || publicClusterHost.equals("") ) {
+    	    publicClusterHost = InetAddress.getLocalHost().getHostAddress();
+        }
+        LOGGER.info("Public cluster host: " + publicClusterHost);
         VertxOptions options = new VertxOptions()
                 .setClustered(true)
                 .setClusterManager(getIgniteClusterManager())
@@ -49,7 +49,7 @@ public class MainApp {
 
                 deploy(vertx);
             } else {
-                System.out.println("Can't create cluster");
+                LOGGER.severe("Can't create cluster");
                 System.exit(1);
             }
         });
@@ -83,7 +83,7 @@ public class MainApp {
 
     private static void deploy(Vertx vertx) {
         // Подключаем verticle к системе
-        System.out.println("Deploy Verticles");
+        LOGGER.info("Deploy Verticles");
         vertx.deployVerticle(new HttpServerVerticle());
     }
 

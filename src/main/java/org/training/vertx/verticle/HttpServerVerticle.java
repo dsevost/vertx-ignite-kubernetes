@@ -7,6 +7,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.training.vertx.comman.Endpoint;
+import java.util.logging.Logger;
 
 import static io.vertx.core.http.HttpMethod.GET;
 
@@ -16,6 +17,8 @@ import static io.vertx.core.http.HttpMethod.GET;
  * Verticle запускающий внутри себя HTTP сервер
  */
 public class HttpServerVerticle extends AbstractVerticle {
+
+    private final static Logger LOGGER = Logger.getLogger(HttpServerVerticle.class.getName());
 
     private EventBus eventBus;
 
@@ -57,11 +60,36 @@ public class HttpServerVerticle extends AbstractVerticle {
                 .method(GET)
                 .handler(this::getTimestamp);
 
+	Router service = Router.router(vertx);
+	httpRouter.mountSubRouter("/openshift", service);
+
+        // Сервис для liveness теста в OpenShift
+        service.route("/liveness")
+                .method(GET)
+                .handler(this::liveness);
+
+        // Сервис для readyness теста в OpenShift
+        service.route("/readyness")
+                .method(GET)
+                .handler(this::readyness);
+
         return httpRouter;
+    }
+    
+    private void liveness(RoutingContext c) {
+	LOGGER.info("HttpServerVerticle::liveness - check for alive");
+        HttpServerResponse response = c.response();
+        response.end("ALIVE");
+    }
+
+    private void readyness(RoutingContext c) {
+	LOGGER.info("HttpServerVerticle::readyness - check for ready to serve");
+        HttpServerResponse response = c.response();
+        response.end("READY");
     }
 
     private void startModelVerticle(RoutingContext context) {
-        System.out.println("Received request to enable model verticle");
+        LOGGER.info("Received request to enable model verticle");
         vertx.deployVerticle(new ModelVerticle());
         HttpServerResponse response = context.response();
         response.end("Model verticle activated!");
@@ -74,18 +102,18 @@ public class HttpServerVerticle extends AbstractVerticle {
      */
     private void getTimestamp(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
-        System.out.println("HttpServerVerticle::getTimestamp - request time");
+        LOGGER.info("HttpServerVerticle::getTimestamp - request time");
 
         //Отправляем запрос времени
         eventBus.send(Endpoint.EB_BROADCAST, "Get timestamp", messageAsyncResult -> {
             //Дожидаемся ответа модели
             if(messageAsyncResult.succeeded()){
-                System.out.println("Timestamp received");
+                LOGGER.fine("Timestamp received");
                 String body = messageAsyncResult.result().body().toString();
                 response.end(body);
-                System.out.println("Success sending response");
+                LOGGER.fine("Success sending response");
             } else {
-                System.out.println("Response from model is not success!");
+                LOGGER.info("Response from model is not success!");
                 response.end("Response from model is not success!");
             }
         });

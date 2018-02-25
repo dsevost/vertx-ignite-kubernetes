@@ -11,9 +11,16 @@
             <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
                 <property name="ipFinder">
                     <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder">
-                      <property name="namespace" value="sbt-ignite-test01" />
-                      <property name="serviceName" value="my-ignite" />
+                      <property name="namespace" value="#{systemProperties['openshift.namespace']}" />
+                      <property name="serviceName" value="#{systemProperties['openshift.service.ignite']}" />
                     </bean>
+                    <!-- bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
+                      <property name="addresses">
+                        <list>
+                          <value>my-ignite</value>
+                        </list>
+                      </property>
+                    </bean -->
                 </property>
             </bean>
         </property>
