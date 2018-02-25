@@ -42,6 +42,12 @@ objects:
         env:
         - name: MAVEN_MIRROR_URL
           value: ${MAVEN_MIRROR_URL}
+        - name: LANG
+          value: ru_RU.UTF-8
+        - name: TZ
+          value: Europe/Moscow
+        - name: JAVA_APP_JAR
+          value: ${JAVA_APP_JAR}
         from:
           kind: ImageStreamTag
           name: redhat-openjdk18-openshift:latest
@@ -102,8 +108,12 @@ objects:
                 fieldPath: status.podIP
           - name: OPENSHIFT_SERVICE_IGNITE
             value: ${OPENSHIFT_SERVICE_IGNITE}
-          - name: JAVA_APP_JAR
-            value: app-fat.jar
+          - name: LANG
+            value: ru_RU.UTF-8
+#          - name: JAVA_APP_JAR
+#            value: ${JAVA_APP_JAR}
+          - name: TZ
+            value: Europe/Moscow
           image: ' '
           imagePullPolicy: Always
           ports:
@@ -259,6 +269,9 @@ parameters:
 - name: MAVEN_MIRROR_URL
   description: Maven reposritory custom URL. If there is one or you do not have an internet connection user this variable to point a local Maven repository
   value: ''
+- name: JAVA_APP_JAR
+  description: Soft link to mail App fat jar
+  value: app-fat.jar
 #- name: INCREMENTAL_BUILD
 #  description: Set to "True" if you would like an incremental builds
 #  value: "False"
