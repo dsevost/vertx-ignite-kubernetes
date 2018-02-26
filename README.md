@@ -16,7 +16,7 @@ $ # export MAVEN_MIRROR_URL=http://your.nexus.domain
 
 $ oc new-project $PROJECT_NAME
 
-$ oc new-app redhat-openjdk18-openshift~$GIT_REPO$GIT_REF --build-env MAVEN_MIRROR_URL=$MAVEN_MIRROR_URL -e JAVA_APP_JAR=app-fat.jar --name $APP_NAME
+$ oc new-app redhat-openjdk18-openshift~$GIT_REPO$GIT_REF --build-env MAVEN_MIRROR_URL=$MAVEN_MIRROR_URL --build-env JAVA_APP_JAR=app-fat.jar --name $APP_NAME
 
 $ cat << EOF
 1. create special service account for query Openshift API to obtain Ignite node's enpoints
