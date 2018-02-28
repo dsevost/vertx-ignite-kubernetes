@@ -267,10 +267,10 @@ parameters:
   generate: expression 
   from: "[a-zA-Z0-9]{10}"
 - name: MAVEN_MIRROR_URL
-  description: Maven reposritory custom URL. If there is one or you do not have an internet connection user this variable to point a local Maven repository
+  description: Maven reposritory custom URL. If there is one or you do not have an internet connection use this variable to point a local Maven repository
   value: ''
 - name: JAVA_APP_JAR
-  description: Soft link to mail App fat jar
+  description: Soft link to main App fat jar
   value: app-fat.jar
 #- name: INCREMENTAL_BUILD
 #  description: Set to "True" if you would like an incremental builds
